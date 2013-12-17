@@ -1,70 +1,116 @@
-function initialize() {
+function makeMapDiv(number, origin, destination) {
+	var mapGroup = document.createElement('div');
+	mapGroup.setAttribute("id","group"+number);
+	mapGroup.setAttribute("class","group");
+	document.querySelector('body').appendChild(mapGroup);
+
+	var from = document.createElement('input');
+	from.setAttribute("class", "from");
+	from.setAttribute("autofocus", "true");
+	from.setAttribute("spellcheck", "false");
+	if(origin) {
+		from.setAttribute("value", origin);
+	}
+	else {
+		from.setAttribute("placeholder", "From..");
+	}
 	
+	document.querySelector("#group"+number).appendChild(from);
+
+	var to = document.createElement('input');
+	to.setAttribute("class", "to");
+	to.setAttribute("spellcheck", "false");
+	if(destination) {
+		to.setAttribute("value", destination);
+	}
+	else {
+		to.setAttribute("placeholder", "To..");
+	}
+	to.addEventListener("keypress", function(e){ 
+			// if the key is return
+			if(e.keyCode === 13){
+				query(from, to, function(DirectionsResult, DirectionsStatus) {
+					if (DirectionsStatus != "OK") {
+						alert(DirectionsStatus);
+					}
+					else {
+						mapView.display(DirectionsResult);
+					}
+				});
+			}
+		});
+
+	document.querySelector("#group"+number).appendChild(to);
+
+	var mapView = new MapView(number);
+	// query(origin, destination);
+}
+
+function MapView(number) {
+	var mapDiv = document.createElement('div');
+	mapDiv.setAttribute("class", "map");
+	mapDiv.setAttribute("style", "height: 100 px; width: 100%");
+	document.querySelector("#group"+number).appendChild(mapDiv);
+
+	this.timeDiv = document.createElement('div');
+	this.timeDiv.setAttribute("class","time");
+	document.querySelector("#group"+number).appendChild(this.timeDiv);
+
 	var mapOptions = {
 		center: new google.maps.LatLng(40.72078,-74.001119),
 		zoom: 16,
 		};
+	this.map = new google.maps.Map(mapDiv, mapOptions);
 
-	var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+	this.renderer = new google.maps.DirectionsRenderer();
+	this.renderer.setMap(this.map);
+}
 
+
+MapView.prototype = {
+	display: function(DirectionsResult) {
+		this.renderer.setDirections(DirectionsResult);
+		if(DirectionsResult.routes[0].legs) {
+			var time = 0;
+			for (var i=0; i<DirectionsResult.routes[0].legs.length; i++) {
+				console.log(DirectionsResult.routes[0].legs[i].duration.value);
+				time += DirectionsResult.routes[0].legs[i].duration.value;
+			}
+			this.timeDiv.innerText = time;
+		}
+	} 
+}
+
+function query(from, to, callback) {
 	var directionstorequest = {
-		origin: "rockefeller center",
-		destination: "times square",
+		origin: from.value,
+		destination: to.value,
 		travelMode: google.maps.TravelMode.WALKING,
 		region: "US"
 	}
-
+	console.log(from.value, to.value);
 	var directionsService = new google.maps.DirectionsService;
-	directionsService.route(directionstorequest, mapDirections);
+	directionsService.route(directionstorequest, callback);
+	// console.log(from.value, to.value);
+}
 
-	function mapDirections(DirectionsResult, DirectionsStatus) {
-		if (DirectionsStatus != "OK") {
-			alert(DirectionsStatus);
+
+
+function renderTime(DirectionsResult, timeDiv) {
+	if(DirectionsResult.routes[0].legs) {
+		var time = 0;
+		for (var i=0; i<DirectionsResult.routes[0].legs.length; i++) {
+			console.log(DirectionsResult.routes[0].legs[i].duration.value);
+			time += DirectionsResult.routes[0].legs[i].duration.value;
 		}
-		else {
-			renderer = new google.maps.DirectionsRenderer();
-			renderer.setMap(map);
-			renderer.setDirections(DirectionsResult);
-
-			if(DirectionsResult.routes[0].legs) {
-				var time = 0;
-				for (var i=0; i<DirectionsResult.routes[0].legs.length; i++) {
-					console.log(DirectionsResult.routes[0].legs[i].duration.value);
-					time += DirectionsResult.routes[0].legs[i].duration.value;
-				}
-				document.getElementById("time").innerText = time;
-				console.log()	
-			}
-		}
+		document.getElementById("time").innerText = time;
 	}
+}
 
 
-	var polyOptions = {
-	   strokeColor: '#000000',
-	   strokeOpacity: 1.0,
-	   strokeWeight: 3
-	};
-	poly = new google.maps.Polyline(polyOptions);
-	poly.setMap(map);
-
-	// Add a listener for the click event
-	google.maps.event.addListener(map, 'click', addLatLng);
-
-	function addLatLng(event) {
-
-	  var path = poly.getPath();
-
-	  // Because path is an MVCArray, we can simply append a new coordinate
-	  // and it will automatically appear.
-	  path.push(event.latLng);
-
-	  // Add a new marker at the new plotted point on the polyline.
-	  var marker = new google.maps.Marker({
-	    position: event.latLng,
-	    title: '#' + path.getLength(),
-	    map: map
-	  });
-	}
+function initialize() {
+	makeMapDiv(1, "San Francisco", null);
+	makeMapDiv(2, null, "New York");
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
