@@ -10,7 +10,9 @@ function writeToScreen(text, leg, div) {
 }
 
 function writeLegTally(tally, leg) {
-	document.querySelector("#"+leg).getElementsByClassName('tally').innerHTML = tally;
+	console.log(leg);
+	console.log(leg+"tally",document.querySelector("#"+leg).getElementsByClassName('tally'));
+	document.querySelector("#"+leg).getElementsByClassName('tally')[0].innerText = ""+tally;
 }
 
 function newTeleportation() {
@@ -39,12 +41,13 @@ function newTeleportation() {
 		});
 	
 	document.querySelector("#leg"+numberofteleportations).appendChild(to);
-	numberofteleportations += 1;
 
 
 	var tally = document.createElement('div');
-	tally.setAttribute("id","tally");
+	tally.setAttribute("class","tally");
 	document.querySelector("#leg"+numberofteleportations).appendChild(tally);
+
+	numberofteleportations += 1;
 }
 
 function main() {
@@ -59,19 +62,19 @@ function main() {
 
 	ws = io.connect()
 	ws.on('distance', function(distance){
-		writeToScreen(distance, 'feedback');
+		writeLegTally(distance[1], distance[0]);
 	});
 
 }
 
 function query() {
-	clearDiv("feedback");
+	// clearDiv("feedback");
 	var query = [];
 	for(var i=1; i<numberofteleportations; i++) {
 		var leg = "leg"+i;		
 		var from = document.querySelector("#"+leg).getElementsByClassName('from')[0].value;
 		var to = document.querySelector("#"+leg).getElementsByClassName('to')[0].value;
-		query.push([leg, from, to]);
+		query.push([from, to, leg]);
 	}
 	console.log(query);
 	ws.emit("query", query);

@@ -1,0 +1,77 @@
+// 80's-tastic
+[
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#8080e4" },
+      { "hue": "#08ff00" }
+    ]
+  },{
+    "featureType": "poi.school",
+    "elementType": "geometry.fill",
+    "stylers": [
+      { "hue": "#ff004c" },
+      { "saturation": 100 },
+      { "lightness": -35 }
+    ]
+  },{
+    "featureType": "road.local",
+    "stylers": [
+      { "color": "#8080ff" }
+    ]
+  },{
+    "featureType": "landscape.man_made",
+    "elementType": "geometry",
+    "stylers": [
+      { "color": "#808080" },
+      { "lightness": -75 }
+    ]
+  },{
+    "featureType": "water",
+    "stylers": [
+      { "saturation": 87 },
+      { "color": "#00ffff" }
+    ]
+  },{
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
+      { "hue": "#00ff11" },
+      { "saturation": 100 },
+      { "lightness": -25 }
+    ]
+  }
+]
+
+// text-only:
+[
+  {
+    "elementType": "geometry",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#808080" },
+      { "lightness": 100 }
+    ]
+  },{
+    "featureType": "administrative",
+    "elementType": "labels.icon",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "elementType": "labels.text.fill",
+    "stylers": [
+      { "visibility": "on" },
+      { "weight": 8 },
+      { "hue": "#00ffc4" },
+      { "saturation": 42 }
+    ]
+  },{
+    "elementType": "labels.icon",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  }
+]

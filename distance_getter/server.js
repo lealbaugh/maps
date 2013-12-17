@@ -2,13 +2,13 @@
 var request = require("request");
 
 
-function getMapData(origin, destination, socket) {
+function getMapData(origin, destination, leg, socket) {
 	url = "http://maps.googleapis.com/maps/api/directions/json?origin="+encodeURIComponent(origin)+"&destination="+encodeURIComponent(destination)+"&mode=walking&sensor=false"
 	console.log(url);
 	request({url:url, followAllRedirects:true}, function (error, response, body) {
 		if (!error) {
 			console.log("received valid response");
-			socket.emit("distance", getDistance(body));
+			socket.emit("distance", [leg, getDistance(body)]);
 		}
 		else {
 			console.log(error);
@@ -58,7 +58,7 @@ io.sockets.on('connection', function(socket){
 	socket.on('query', function(query){
 		console.log(query);
 		for (var i=0; i<query.length;i++) {
-			getMapData(query[i][0], query[i][1], socket);
+			getMapData(query[i][0], query[i][1], query[i][2], socket);
 		}
 	});
 });
