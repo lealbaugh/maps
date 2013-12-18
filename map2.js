@@ -22,16 +22,6 @@ function InputGroup(origin, destination, insertLocation) {
 		this.mapGroup.appendChild(addButton);
 	}
 
-	if(!origin && !destination) {
-		var removeButton = document.createElement('input');
-		removeButton.setAttribute("type", "button");
-		removeButton.setAttribute("value", "less div");
-		removeButton.addEventListener("click", function () {
-					document.querySelector("#sidebar").removeChild(self.mapGroup);
-				});
-		this.mapGroup.appendChild(removeButton);
-	}
-
 	var from = document.createElement('input');
 	from.setAttribute("class", "from");
 	// from.setAttribute("autofocus", "true");
@@ -72,6 +62,15 @@ function InputGroup(origin, destination, insertLocation) {
 				}
 			});
 		}
+	}
+
+	if(!origin && !destination) {
+		var removeButton = document.createElement('img');
+		removeButton.src = "img/close.png";
+		removeButton.addEventListener("click", function () {
+					document.querySelector("#sidebar").removeChild(self.mapGroup);
+				});
+		this.mapGroup.appendChild(removeButton);
 	}
 
 	var mapView = new MapView(this.mapGroup);
