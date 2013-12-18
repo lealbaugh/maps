@@ -1,6 +1,5 @@
 function InputGroup(origin, destination, insertLocation) {
 	this.mapGroup = document.createElement('div');
-	// this.mapGroup.setAttribute("id","group"+number);
 	this.mapGroup.setAttribute("class","group");
 	if (!insertLocation) {
 		document.querySelector('#sidebar').appendChild(this.mapGroup);
@@ -16,9 +15,9 @@ function InputGroup(origin, destination, insertLocation) {
 		addButton.setAttribute("type", "button");
 		addButton.setAttribute("value", "more div");
 		addButton.addEventListener("click", function () {
-					console.log("this:"+self);
-					makeNewInput(self.mapGroup);
-				});
+				console.log("this:"+self);
+				makeNewInput(self.mapGroup);
+			});
 		this.mapGroup.appendChild(addButton);
 	}
 
@@ -83,21 +82,6 @@ function InputGroup(origin, destination, insertLocation) {
 	};
 }
 
-function initMapAndSidebar() {
-	var sidebarDiv = document.createElement('div');
-	sidebarDiv.setAttribute("id", "sidebar");
-	document.querySelector("body").appendChild(sidebarDiv);
-
-	var mapDiv = document.createElement('div');
-	mapDiv.setAttribute("id", "map");
-	document.querySelector("body").appendChild(mapDiv);
-
-	var mapOptions = {
-		center: new google.maps.LatLng(40.72078,-74.001119),
-		zoom: 16,
-		};
-	map = new google.maps.Map(mapDiv, mapOptions);
-}
 
 
 function MapView(locationDiv) {
@@ -161,9 +145,26 @@ function initInputs(number, origin, destination) {
 	}
 }
 
+function initMapAndSidebar() {
+	var sidebarDiv = document.createElement('div');
+	sidebarDiv.setAttribute("id", "sidebar");
+	document.querySelector("body").appendChild(sidebarDiv);
+
+	var mapDiv = document.createElement('div');
+	mapDiv.setAttribute("id", "map");
+	document.querySelector("body").appendChild(mapDiv);
+
+	var mapOptions = {
+		center: new google.maps.LatLng(40.72078,-74.001119),
+		zoom: 16,
+		};
+	map = new google.maps.Map(mapDiv, mapOptions);
+}
+
+
 function initialize() {
 	initMapAndSidebar();
-	initInputs(2, "San Francisco", "New York");
+	initInputs(10, "San Francisco", "New York");
 	// groupOne = new InputGroup(1, "San Francisco", null);
 	// // makeMapDiv(2, null, null);
 	// groupThree = new InputGroup(3, null, "New York");
