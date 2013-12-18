@@ -6,7 +6,7 @@ function makeMapDiv(number, origin, destination) {
 
 	var from = document.createElement('input');
 	from.setAttribute("class", "from");
-	from.setAttribute("autofocus", "true");
+	// from.setAttribute("autofocus", "true");
 	from.setAttribute("spellcheck", "false");
 	if(origin) {
 		from.setAttribute("value", origin);
@@ -95,22 +95,10 @@ function query(from, to, callback) {
 }
 
 
-
-function renderTime(DirectionsResult, timeDiv) {
-	if(DirectionsResult.routes[0].legs) {
-		var time = 0;
-		for (var i=0; i<DirectionsResult.routes[0].legs.length; i++) {
-			console.log(DirectionsResult.routes[0].legs[i].duration.value);
-			time += DirectionsResult.routes[0].legs[i].duration.value;
-		}
-		document.getElementById("time").innerText = time;
-	}
-}
-
-
 function initialize() {
 	makeMapDiv(1, "San Francisco", null);
-	makeMapDiv(2, null, "New York");
+	// makeMapDiv(2, null, null);
+	makeMapDiv(3, null, "New York");
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
