@@ -1,8 +1,36 @@
-function InputGroup(number, origin, destination) {
-	var mapGroup = document.createElement('div');
-	mapGroup.setAttribute("id","group"+number);
-	mapGroup.setAttribute("class","group");
-	document.querySelector('#sidebar').appendChild(mapGroup);
+function InputGroup(origin, destination, insertLocation) {
+	this.mapGroup = document.createElement('div');
+	// this.mapGroup.setAttribute("id","group"+number);
+	this.mapGroup.setAttribute("class","group");
+	if (!insertLocation) {
+		document.querySelector('#sidebar').appendChild(this.mapGroup);
+	}
+	else {
+		console.log("inserting at:"+insertLocation);
+		document.querySelector('#sidebar').insertBefore(this.mapGroup, insertLocation);
+	}
+
+	var self = this;
+	if(!origin) {
+		var addButton = document.createElement('input');
+		addButton.setAttribute("type", "button");
+		addButton.setAttribute("value", "more div");
+		addButton.addEventListener("click", function () {
+					console.log("this:"+self);
+					makeNewInput(self.mapGroup);
+				});
+		this.mapGroup.appendChild(addButton);
+	}
+
+	if(!origin && !destination) {
+		var removeButton = document.createElement('input');
+		removeButton.setAttribute("type", "button");
+		removeButton.setAttribute("value", "less div");
+		removeButton.addEventListener("click", function () {
+					document.querySelector("#sidebar").removeChild(self.mapGroup);
+				});
+		this.mapGroup.appendChild(removeButton);
+	}
 
 	var from = document.createElement('input');
 	from.setAttribute("class", "from");
@@ -10,12 +38,13 @@ function InputGroup(number, origin, destination) {
 	from.setAttribute("spellcheck", "false");
 	if(origin) {
 		from.setAttribute("value", origin);
+		from.setAttribute("readonly", "true");
 	}
 	else {
 		from.setAttribute("placeholder", "From..");
 	}
 	from.addEventListener("keypress", sendQuery);
-	document.querySelector("#group"+number).appendChild(from);
+	this.mapGroup.appendChild(from);
 
 
 	var to = document.createElement('input');
@@ -23,12 +52,13 @@ function InputGroup(number, origin, destination) {
 	to.setAttribute("spellcheck", "false");
 	if(destination) {
 		to.setAttribute("value", destination);
+		to.setAttribute("readonly", "true");
 	}
 	else {
 		to.setAttribute("placeholder", "To..");
 	}
 	to.addEventListener("keypress", sendQuery);
-	document.querySelector("#group"+number).appendChild(to);
+	this.mapGroup.appendChild(to);
 
 	function sendQuery(e) { 
 		// if the key is return
@@ -44,9 +74,15 @@ function InputGroup(number, origin, destination) {
 		}
 	}
 
-	var mapView = new MapView(number);
-}
+	var mapView = new MapView(this.mapGroup);
 
+	this.getTo = function() {
+		return to.value;
+	};
+	this.getFrom = function () {
+		return from.value;
+	};
+}
 
 function initMapAndSidebar() {
 	var sidebarDiv = document.createElement('div');
@@ -65,10 +101,10 @@ function initMapAndSidebar() {
 }
 
 
-function MapView(number) {
+function MapView(locationDiv) {
 	this.timeDiv = document.createElement('div');
 	this.timeDiv.setAttribute("class","time");
-	document.querySelector("#group"+number).appendChild(this.timeDiv);
+	locationDiv.appendChild(this.timeDiv);
 
 	this.renderer = new google.maps.DirectionsRenderer();
 	this.renderer.setMap(map);
@@ -100,12 +136,38 @@ function query(from, to, callback) {
 	directionsService.route(directionstorequest, callback);
 }
 
+function makeNewInput(insertLocation) {
+	new InputGroup(null, null, insertLocation);
+	console.log("new input, before: " + insertLocation);
+}
+
+function initInputs(number, origin, destination) {
+	// inputs = [];
+	for (i=1; i<=number; i++) {
+		var thisorigin, thisdestination;
+		if (i==1) {
+			thisorigin = origin;
+		}
+		else {
+			thisorigin = null;
+		}
+		if (i == number) {
+			thisdestination = destination;
+		}
+		else {
+			thisdestination = null;
+		}
+		var thisgroup = new InputGroup(thisorigin, thisdestination, null);
+		// inputs.push(thisgroup);
+	}
+}
 
 function initialize() {
 	initMapAndSidebar();
-	new InputGroup(1, "San Francisco", null);
-	// makeMapDiv(2, null, null);
-	new InputGroup(3, null, "New York");
+	initInputs(2, "San Francisco", "New York");
+	// groupOne = new InputGroup(1, "San Francisco", null);
+	// // makeMapDiv(2, null, null);
+	// groupThree = new InputGroup(3, null, "New York");
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);

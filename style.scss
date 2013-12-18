@@ -4,7 +4,6 @@ html {
 }
 body { 
 	height:100%;
-	background-color: #67C78F;
 	width: 100%; 
 	margin: 0; 
 	padding: 0;
@@ -19,12 +18,17 @@ body {
 #sidebar {
 	float:left;
 	width:30%;
-	background-color: #fff;
+	background-color: #67C78F;
+	overflow: auto;
+	height:100%;
 	.group { 
-		/*border: 2px solid #333;*/
+		border: 2px solid #fff;
 		margin: 5px;
 		padding: 3px;
 		background-color: #67B1C7;
+	}
+	.button {
+		display:block;
 	}
 	.from { 
 		z-index: 1;
