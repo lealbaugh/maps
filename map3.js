@@ -1,21 +1,72 @@
+// Origin and destination are TextEntry objects with a string map location and whether or not they are changeable.
+// Location, if provided, is the location in the DOM for the InputRenderer to insert before.
 function InputGroup(origin, destination, location) {
 	this.from = origin;
 	this.to = destination;
+	this.timeInSeconds = 0;
 	
 	var inputRenderer = new InputRenderer(this, location);
 
 	this.addLeg = function() {
 		this.from = inputRenderer.getFrom();
 		this.to = inputRenderer.getTo();
-		var newGroup = new InputGroup(this.from, null, inputRenderer.mainDiv);
+		var newGroup = new InputGroup(this.from, new TextEntry("", true), inputRenderer.mainDiv);
 		addToArray(inputs, newGroup, this);
-		inputRenderer.setFrom("");
-		console.log(inputs);
+		inputRenderer.setFrom(new TextEntry("", true));
 	}
+}
+
+function TextEntry(place, changeable) {
+	this.place = place;
+	this.changeable = changeable;
 }
 
 function InputRenderer(inputGroup, location) {
 	this.inputGroup = inputGroup;
+
+	this.getTo = function() {
+		var changeable = true;
+		if (to.getAttribute("readonly") == "true" || to.getAttribute("readonly") == true) {
+			changeable = false;
+		}
+		var entry = new TextEntry(to.value, changeable);
+		return entry;
+	};
+
+	this.getFrom = function () {
+		var changeable = true;
+		if (from.getAttribute("readonly") == "true" || from.getAttribute("readonly") == true) {
+			changeable = false;
+		}
+		var entry = new TextEntry(from.value, changeable);
+		return entry;
+	};
+	
+	this.setTo = function(textEntry) {
+		if(textEntry.changeable) {
+			to.setAttribute("readonly", false);
+			to.removeAttribute("readonly");
+		}
+		else {
+			to.setAttribute("readonly", true);
+		}
+		to.setAttribute("placeholder", "To..");
+		to.value = textEntry.place;
+	};
+
+	this.setFrom = function (textEntry) {
+		if(textEntry.changeable) {
+			from.setAttribute("readonly", false);
+			from.removeAttribute("readonly");
+		}
+		else {
+			from.setAttribute("readonly", true);
+		}
+		from.setAttribute("placeholder", "From..");
+		from.value = textEntry.place;
+	};
+
+
 
 	this.mainDiv = document.createElement('div');
 	this.mainDiv.setAttribute("class","group");
@@ -30,24 +81,18 @@ function InputRenderer(inputGroup, location) {
 
 	var from = document.createElement('input');
 	from.setAttribute("class", "from");
-	// from.setAttribute("autofocus", "true");
 	from.setAttribute("spellcheck", "false");
-	if(inputGroup.from) {
-		from.setAttribute("value", inputGroup.from);
-		from.setAttribute("readonly", "true");
-	}
-	else {
-		from.setAttribute("placeholder", "From..");
-	}
 	from.addEventListener("keypress", sendQuery);
 	this.mainDiv.appendChild(from);
+	this.setFrom(inputGroup.from);
 
-	var self = this;
+
 	var addButton = document.createElement('input');
 	addButton.setAttribute("type", "button");
-	addButton.setAttribute("value", "more div");
+	addButton.setAttribute("value", "+");
 	addButton.addEventListener("click", function() {
 		self.inputGroup.addLeg();
+		console.log(inputs);
 	});
 	this.mainDiv.appendChild(addButton);
 	
@@ -55,22 +100,18 @@ function InputRenderer(inputGroup, location) {
 	var to = document.createElement('input');
 	to.setAttribute("class", "to");
 	to.setAttribute("spellcheck", "false");
-	if(inputGroup.to) {
-		to.setAttribute("value", inputGroup.to);
-		to.setAttribute("readonly", "true");
-	}
-	else {
-		to.setAttribute("placeholder", "To..");
-	}
 	to.addEventListener("keypress", sendQuery);
 	this.mainDiv.appendChild(to);
+	this.setTo(inputGroup.to);
 
 	var self = this;
-	if(!inputGroup.from && !inputGroup.to) {
+	if(inputGroup.from.changeable && inputGroup.to.changeable) {
 		var removeButton = document.createElement('img');
 		removeButton.src = "img/close.png";
 		removeButton.addEventListener("click", function () {
+					removeFromArray(inputs, self.inputGroup);
 					document.querySelector("#sidebar").removeChild(self.mainDiv);
+					console.log(inputs);
 				});
 		this.mainDiv.appendChild(removeButton);
 	}
@@ -88,20 +129,7 @@ function InputRenderer(inputGroup, location) {
 			});
 		}
 	}
-
-	this.getTo = function() {
-		return to.value;
-	};
-	this.getFrom = function () {
-		return from.value;
-	};
-	this.setTo = function(value) {
-		to.setAttribute("value", value);
-	};
-	this.setFrom = function (value) {
-		from.setAttribute("value", value);
-	};
-
+	
 	var mapView = new MapView(this.mainDiv);
 }
 
@@ -142,11 +170,6 @@ function query(from, to, callback) {
 	directionsService.route(directionstorequest, callback);
 }
 
-function makeNewInput(insertLocation) {
-	new InputGroup(null, null, insertLocation);
-	console.log("new input, before: " + insertLocation);
-}
-
 
 //addtoArray adds an element just before the beforeElement
 function addToArray(target, newElement, beforeElement) {
@@ -154,21 +177,26 @@ function addToArray(target, newElement, beforeElement) {
 	target.splice(location, 0, newElement);
 }
 
+function removeFromArray(target, elementToRemove) {
+	var location = target.indexOf(elementToRemove);
+	target.splice(location, 1);
+}
+
 function initInputs(number, origin, destination) {
 	inputs = [];
 	for (i=1; i<=number; i++) {
 		var thisorigin, thisdestination;
 		if (i==1) {
-			thisorigin = origin;
+			thisorigin = new TextEntry(origin, false);
 		}
 		else {
-			thisorigin = null;
+			thisorigin = new TextEntry("", true);
 		}
 		if (i == number) {
-			thisdestination = destination;
+			thisdestination = new TextEntry(destination, false);
 		}
 		else {
-			thisdestination = null;
+			thisdestination = new TextEntry("", true);
 		}
 		var thisgroup = new InputGroup(thisorigin, thisdestination, null);
 		inputs.push(thisgroup);
@@ -195,7 +223,7 @@ function initMapAndSidebar() {
 
 function initialize() {
 	initMapAndSidebar();
-	initInputs(4, "San Francisco", "New York");
+	initInputs(1, "San Francisco", "New York");
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
